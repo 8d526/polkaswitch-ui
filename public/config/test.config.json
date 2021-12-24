@@ -7,7 +7,9 @@
     "bridgeURI": "https://wallet.matic.network/",
     "tokenList": "/tokens/eth.list.json",
     "chainId": "1",
-    "nodeProvider": "https://api-eth.swing.xyz/3b520ae779047524795c39e0ea17ce5b5304057d/",
+    "nodeProviders": [
+      "https://eth-mainnet.alchemyapi.io/v2/hrkUnlgn_VD_KbxEjpo7D2mVwTfAVUJW"
+    ],
     "explorerBaseUrl": "https://etherscan.io/tx/",
     "gasApi": "https://ethgasstation.info/json/ethgasAPI.json",
     "color": "#5C69B5",
@@ -26,10 +28,8 @@
       "USDC",
       "DAI"
     ],
-    "tradeView": {
-      "platform": "ethereum",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/ethereum",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "ethereum"
     },
     "singleChainSupported": false,
     "crossChainSupported": true,
@@ -47,7 +47,10 @@
     "bridgeURI": "https://wallet.matic.network/",
     "tokenList": "/tokens/eth.list.json",
     "chainId": "1287",
-    "nodeProvider": "https://api-matic.polkaswitch.com/3d041599a52783f163b2515d3ab10f900fc61c01/",
+    "nodeProviders": [
+      "https://arb-mainnet.g.alchemy.com/v2/kyKNf692Pn92sd3FTtg0pIBAnV5nuDUm",
+      "https://api-matic.polkaswitch.com/3d041599a52783f163b2515d3ab10f900fc61c01/"
+    ],
     "explorerBaseUrl": "https://polygonscan.com/tx/",
     "gasApi": "https://ethgasstation.info/json/ethgasAPI.json",
     "desiredParts": 3,
@@ -71,10 +74,8 @@
       "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
       "0xd26114cd6EE289AccF82350c8d8487fedB8A0C07"
     ],
-    "tradeView": {
-      "platform": "ethereum",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/arbitrum-one",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "ethereum"
     },
     "singleChainSupported": false,
     "crossChainSupported": false,
@@ -90,7 +91,10 @@
     "bridgeURI": "https://wallet.matic.network/",
     "tokenList": "/tokens/137.list.json",
     "chainId": "137",
-    "nodeProvider": "https://api-matic.polkaswitch.com/3d041599a52783f163b2515d3ab10f900fc61c01/",
+    "nodeProviders": [
+      "https://polygon-mainnet.g.alchemy.com/v2/cDgPXY_DnB77q44_HMbfaoo-ApR8E0VP",
+      "https://api-matic.polkaswitch.com/3d041599a52783f163b2515d3ab10f900fc61c01/"
+    ],
     "explorerBaseUrl": "https://polygonscan.com/tx/",
     "gasApi": "https://gasstation-mainnet.matic.network",
     "desiredParts": 3,
@@ -117,10 +121,8 @@
       "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
       "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
     ],
-    "tradeView": {
-      "platform": "polygon-pos",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/polygon-pos",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "polygon-pos"
     },
     "singleChainSupported": true,
     "crossChainSupported": true,
@@ -139,7 +141,9 @@
     "bridgeURI": "https://app.nerve.fi/bridge",
     "tokenList": "/tokens/56.list.json",
     "chainId": "56",
-    "nodeProvider": "https://api-smart-chain.polkaswitch.com/fff0dd6bf467085a65f5e23ea585adfa5da745e1/",
+    "nodeProviders": [
+      "https://api-smart-chain.polkaswitch.com/fff0dd6bf467085a65f5e23ea585adfa5da745e1/"
+    ],
     "explorerBaseUrl": "https://bscscan.com/tx/",
     "gasApi": false,
     "desiredParts": 3,
@@ -166,10 +170,8 @@
       "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
       "0x4BD17003473389A42DAF6a0a729f6Fdb328BbBd7"
     ],
-    "tradeView": {
-      "platform": "binance-smart-chain",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/binance-smart-chain",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "binance-smart-chain"
     },
     "singleChainSupported": true,
     "crossChainSupported": true,
@@ -187,8 +189,10 @@
     "bridgeURI": "https://bridge.avax.network/",
     "tokenList": "/tokens/43114.list.json",
     "chainId": "43114",
-    "nodeProvider": "https://api.avax.network/ext/bc/C/rpc",
-    "nodeProvider2": "https://avalanche--mainnet--rpc.datahub.figment.io/apikey/b56dcd7987f05a43637a94ad98d546be/ext/bc/C/rpc",
+    "nodeProviders": [
+      "https://api.avax.network/ext/bc/C/rpc"
+    ],
+    "nodeProviderOld": "https://avalanche--mainnet--rpc.datahub.figment.io/apikey/b56dcd7987f05a43637a94ad98d546be/ext/bc/C/rpc",
     "explorerBaseUrl": "https://cchain.explorer.avax.network/tx/",
     "gasApi": false,
     "desiredParts": 3,
@@ -204,22 +208,20 @@
       }
     },
     "defaultPair": {
-      "to": "0xde3A24028580884448a5397872046a019649b084",
+      "to": "0xc7198437980c041c805a1edcba50c1ce5db95118",
       "from": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
     },
     "topTokens": [
       "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "0xde3A24028580884448a5397872046a019649b084",
+      "0xc7198437980c041c805a1edcba50c1ce5db95118",
       "0xf20d962a6c8f70c731bd838a3a388D7d48fA6e15",
       "0x408D4cD0ADb7ceBd1F1A1C33A0Ba2098E1295bAB",
       "0x8cE2Dee54bB9921a2AE0A63dBb2DF8eD88B91dD9",
       "0x60781C2586D68229fde47564546784ab3fACA982",
       "0xaEb044650278731Ef3DC244692AB9F64C78FfaEA"
     ],
-    "tradeView": {
-      "platform": "avalanche",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/avalanche",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "avalanche"
     },
     "singleChainSupported": true,
     "crossChainSupported": true,
@@ -236,7 +238,9 @@
     "bridgeURI": "https://bridge.xdaichain.com/",
     "tokenList": "/tokens/100.list.json",
     "chainId": "100",
-    "nodeProvider": "https://api-xdai.swing.xyz/6e25f5fc6a6efc79fa8c97b2c699abe2d59f6817/",
+    "nodeProviders": [
+      "https://api-xdai.swing.xyz/6e25f5fc6a6efc79fa8c97b2c699abe2d59f6817/"
+    ],
     "explorerBaseUrl": "https://blockscout.com/xdai/mainnet/tx/",
     "gasApi": false,
     "desiredParts": 18,
@@ -263,10 +267,8 @@
       "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
       "0x7f7440C5098462f833E123B44B8A03E1d9785BAb"
     ],
-    "tradeView": {
-      "platform": "xdai",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/xdai",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "xdai"
     },
     "singleChainSupported": true,
     "crossChainSupported": true,
@@ -277,14 +279,16 @@
     ]
   },
   {
-    "enabled": true,
+    "enabled": false,
     "name": "Fantom",
     "aggregatorAddress": "0xF09ecB66eF88973eBE7B0B5B5d700050F200c85D",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png",
     "bridgeURI": "https://multichain.xyz/",
     "tokenList": "/tokens/250.list.json",
     "chainId": "250",
-    "nodeProvider": "https://api-fantom.swing.xyz/efefa0dd29e1885643893565b6de2d551e77e09c/",
+    "nodeProviders": [
+      "https://api-fantom.swing.xyz/efefa0dd29e1885643893565b6de2d551e77e09c/"
+    ],
     "explorerBaseUrl": "https://ftmscan.com/tx/",
     "gasApi": false,
     "desiredParts": 18,
@@ -311,10 +315,8 @@
       "0x74b23882a30290451a17c44f4f05243b6b58c76d",
       "0xae75a438b2e0cb8bb01ec1e1e376de11d44477cc"
     ],
-    "tradeView": {
-      "platform": "fantom",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/fantom",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "fantom"
     },
     "singleChainSupported": true,
     "crossChainSupported": true,

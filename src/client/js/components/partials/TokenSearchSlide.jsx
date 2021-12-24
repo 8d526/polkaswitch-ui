@@ -8,7 +8,6 @@ export default class TokenSearchSlide extends Component {
   }
 
   render() {
-    var isCrossChainEnabled = TokenListManager.isCrossChainEnabled();
     var network = this.props.network || TokenListManager.getCurrentNetworkConfig();
     var crossChainTokens = _.map(network.supportedCrossChainTokens, function(v) {
       return TokenListManager.findTokenById(v, network)
@@ -16,7 +15,7 @@ export default class TokenSearchSlide extends Component {
 
     // passing undefined, will default to the original network list.
     // we only want to show the cross-chain tokens from the sending chain
-    var tokenList = isCrossChainEnabled && this.props.isFrom ? crossChainTokens : undefined;
+    var tokenList = this.props.isCrossChain && this.props.isFrom ? crossChainTokens : undefined;
 
     return (
       <div className="page page-stack page-view-search">

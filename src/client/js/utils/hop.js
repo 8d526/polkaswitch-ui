@@ -41,6 +41,14 @@ window.HopUtils = {
 
     var sdk = this._sdk = (new Hop('mainnet')).connect(signer);
 
+    sdk.setChainProviders({
+      ethereum: new providers.StaticJsonRpcProvider('https://mainnet.infura.io/v3/84842078b09946638c03157f83405213'),
+      polygon: new providers.StaticJsonRpcProvider('https://polygon-rpc.com'),
+      xdai: new providers.StaticJsonRpcProvider('https://rpc.xdaichain.com'),
+      optimism: new providers.StaticJsonRpcProvider('https://mainnet.optimism.io'),
+      arbitrum: new providers.StaticJsonRpcProvider('https://arb1.arbitrum.io/rpc'),
+    });
+
     this._attachSdkListeners(sdk);
     return sdk;
   },
@@ -105,12 +113,12 @@ window.HopUtils = {
     const hopSendingChain = new Chain(
       sendingChain.name,
       sendingChain.chainId,
-      sendingChain.nodeProvider
+      sendingChain.nodeProviders[0]
     );
     const hopReceivingChain = new Chain(
       receivingChain.name,
       receivingChain.chainId,
-      receivingChain.nodeProvider
+      receivingChain.nodeProviders[0]
     );
     const hopBridge = this._sdk.bridge(sendingAsset.symbol);
 
@@ -161,12 +169,12 @@ window.HopUtils = {
     const hopSendingChain = new Chain(
       sendingChain.name,
       sendingChain.chainId,
-      sendingChain.nodeProvider
+      sendingChain.nodeProviders[0]
     );
     const hopReceivingChain = new Chain(
       receivingChain.name,
       receivingChain.chainId,
-      receivingChain.nodeProvider
+      receivingChain.nodeProviders[0]
     );
 
     const hopBridge = this._sdk.bridge(sendingAsset.symbol);

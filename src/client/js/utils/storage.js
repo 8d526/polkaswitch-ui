@@ -20,9 +20,9 @@ const DEFAULT_SWAP_SETTINGS = Object.freeze({
 
 window.Storage = {
   swapSettings: _.extend({}, DEFAULT_SWAP_SETTINGS),
-
   selectedNetwork: false,
   crossChainEnabled: false,
+  cachedTokenLogoUrls: {},
 
   initialize: function() {
     let cachedSettings = store.get('settings');
@@ -34,14 +34,14 @@ window.Storage = {
     }
 
     // initialize the Network
-    var defaultNetwork = _.findWhere(window.NETWORK_CONFIGS, { enabled: true }).name;
+    var defaultNetwork = _.findWhere(window.NETWORK_CONFIGS, { enabled: true, singleChainSupported: true }).name;
     var storedNetwork = _.findWhere(window.NETWORK_CONFIGS, {
       name: store.get('selectedNetwork'),
       enabled: true
     });
     this.selectedNetwork = (storedNetwork && storedNetwork.name) || defaultNetwork;
-
     this.crossChainEnabled = store.get('crossChainEnabled', false);
+    this.cachedTokenLogoUrls = store.get('tokenLogoUrls') || {};
   },
 
   updateNetwork: function(network) {
@@ -87,6 +87,20 @@ window.Storage = {
     store.set('settings', this.swapSettings)
     EventManager.emitEvent('swapSettingsUpdated', 1);
   },
+
+  updateCachedTokenLogoUrl: function (contractAddress, imgSrc) {
+    this.cachedTokenLogoUrls[contractAddress] = imgSrc;
+    store.set('tokenLogoUrls', this.cachedTokenLogoUrls);
+  },
+
+  getCachedTokenLogoUrl: function(contractAddress) {
+    const logoUrl = this.cachedTokenLogoUrls[contractAddress];
+    if (logoUrl) {
+      return logoUrl;
+    } else {
+      return null;
+    }
+  }
 }
 
 export default window.Storage;

@@ -61,7 +61,7 @@ export default class TxCrossChainActiveStatusView extends Component {
     }
 
     return (
-      <div className={classnames("level is-mobile tx-item", clazz)}>
+      <div className={classnames("level is-mobile tx-history tx-item", clazz)}>
         <div className="level-item tx-icon">
           <div className="icon">
             {icon}
@@ -77,7 +77,7 @@ export default class TxCrossChainActiveStatusView extends Component {
           </div>
         </div>
         {isActionNeeded && (
-          <div className="level-item">
+          <div className="level-item tx-action">
             <button
               className="button is-warning is-small"
               onClick={this.handleFinishAction(txData.invariant.transactionId)}>Finish</button>

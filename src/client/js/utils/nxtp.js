@@ -8,49 +8,23 @@ import Storage from './storage';
 import BN from 'bignumber.js';
 import { ApprovalState } from "../constants/Status";
 
-import { BigNumber, constants, providers, Signer, utils } from "ethers";
+import { BigNumber, constants, Signer, utils } from "ethers";
 import { ActiveTransaction, NxtpSdk, NxtpSdkEvents, HistoricalTransaction } from "@connext/nxtp-sdk";
 import {
   AuctionResponse,
   ChainData,
   CrosschainTransaction,
   getRandomBytes32,
+  getChainData,
   Logger,
   TransactionPreparedEvent,
 } from "@connext/nxtp-utils";
-import { getBalance, getChainName, getExplorerLinkForTx, mintTokens as _mintTokens } from "./nxtpUtils";
 import swapFn from "./swapFn";
 
 // never exponent
 BN.config({ EXPONENTIAL_AT: 1e+9 });
 
 let store = require('store');
-
-const REACT_APP_CHAIN_CONFIG = {
-  "56":{
-    "provider": ["https://api-smart-chain.polkaswitch.com/fff0dd6bf467085a65f5e23ea585adfa5da745e1/"]
-  },
-  "137":{
-    "provider":["https://api-matic.polkaswitch.com/3d041599a52783f163b2515d3ab10f900fc61c01/"]
-  },
-  "43114":{
-    "provider":["https://api.avax.network/ext/bc/C/rpc"],
-    "subgraph":"https://api.thegraph.com/subgraphs/name/connext/nxtp-avalanche",
-    "transactionManagerAddress": "0x31eFc4AeAA7c39e54A33FDc3C46ee2Bd70ae0A09"
-  }
-};
-
-export const chainProviders = {};
-
-Object.entries(REACT_APP_CHAIN_CONFIG).forEach(([chainId, { provider, subgraph, transactionManagerAddress }]) => {
-  chainProviders[parseInt(chainId)] = {
-    provider: new providers.FallbackProvider(
-      provider.map((p) => new providers.StaticJsonRpcProvider(p, parseInt(chainId))),
-    ),
-    subgraph,
-    transactionManagerAddress,
-  };
-});
 
 window.NxtpUtils = {
   _queue: {},
@@ -63,12 +37,33 @@ window.NxtpUtils = {
     return `connext_${Wallet.currentAddress()}`;
   },
 
+  _sdkConfig: false,
+  _connextChainData: false,
+
   initalize: async function() {
+    this._connextChainData = await getChainData();
+    this._prepSdkConfig();
+
     EventManager.listenFor('walletUpdated', this.resetSdk.bind(this));
 
     if (Wallet.isConnected()) {
       this._sdk = await this.initalizeSdk();
     }
+  },
+
+  _prepSdkConfig: function() {
+    this._sdkConfig = {};
+
+    window.NETWORK_CONFIGS.forEach((e) => {
+      if (e.enabled && e.crossChainSupported) {
+        var connextData = this._connextChainData.get(e.chainId);
+
+        this._sdkConfig[e.chainId] = {
+          providers: e.nodeProviders,
+          subgraph: connextData?.subgraph
+        }
+      }
+    });
   },
 
   isSdkInitalized: function() {
@@ -78,11 +73,12 @@ window.NxtpUtils = {
   initalizeSdk: async function() {
     const signer = Wallet.getProvider().getSigner();
 
-    var sdk = this._sdk = new NxtpSdk(
-      { chainConfig: chainProviders, signer: signer },
-      new Logger({ name: "NxtpSdk", level: "info" }),
-      process.env.REACT_APP_NETWORK || "mainnet",
-    );
+    var sdk = this._sdk = new NxtpSdk({
+      chainConfig: this._sdkConfig,
+      signer: signer,
+      logger: new Logger({ name: "NxtpSdk", level: "info" }),
+      network: process.env.REACT_APP_NETWORK || "mainnet"
+    });
 
     this.attachNxtpSdkListeners(sdk);
     return sdk;

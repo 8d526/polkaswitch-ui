@@ -56,6 +56,32 @@ export default {
     }
   },
 
+  isSupported: function(to, toChain, from, fromChain) {
+    var bridgeOption = Storage.swapSettings.bridgeOption;
+
+    var targetChainIds = [+toChain.chainId, +fromChain.chainId];
+
+    if ("hop" === bridgeOption) {
+      if (!HOP_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
+        return [false, `${toChain.name} is not supported by Hop Bridge`];
+      } else if (!HOP_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
+        return [false, `${fromChain.name} is not supported by Hop Bridge`];
+      } else {
+        return [true, false];
+      }
+    }
+
+    else {
+      if (!CONNEXT_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
+        return [false, `${toChain.name} is not supported by Connext Bridge`];
+      } else if (!CONNEXT_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
+        return [false, `${fromChain.name} is not supported by Connext Bridge`];
+      } else {
+        return [true, false];
+      }
+    }
+  },
+
   supportedBridges: function(to, toChain, from, fromChain) {
     var bridges = [];
     var targetChainIds = [+toChain.chainId, +fromChain.chainId];

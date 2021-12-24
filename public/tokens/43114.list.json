@@ -2464,11 +2464,10 @@
   },
   {
     "chainId": 43114,
-    "address": "0xde3A24028580884448a5397872046a019649b084",
+    "address": "0xc7198437980c041c805a1edcba50c1ce5db95118",
     "decimals": 6,
     "name": "Tether USD",
-    "symbol": "USDT",
-    "logoURI": "https://raw.githubusercontent.com/ava-labs/bridge-tokens/main/avalanche-tokens/0xde3A24028580884448a5397872046a019649b084/logo.png"
+    "symbol": "USDT"
   },
   {
     "chainId": 43114,

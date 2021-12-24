@@ -393,6 +393,7 @@ export default class BridgeWidget extends Component {
           onEntering={this.triggerHeightResize}
           classNames="slidein">
           <TokenSearchSlide
+            isCrossChain={true}
             isFrom={this.state.searchTarget === "from"}
             network={this.state.searchTarget === "to" ? this.state.toChain : this.state.fromChain}
             showSearch={this.state.showSearch}

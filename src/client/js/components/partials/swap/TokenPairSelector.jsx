@@ -37,10 +37,12 @@ export default function TokenPairSelector(props){
                     size={54}
                     mr={-10}
                     z_index={10}
+                    token={{ address: props.selectedPair.fromAddress }}
                     imgSrc={props.selectedPair.fromTokenLogo}/>
                   <TokenIconImg
                     size={54}
                     mr={10}
+                    token={{ address: props.selectedPair.toAddress }}
                     imgSrc={props.selectedPair.toTokenLogo}/>
                   <span className="text">{props.selectedPair.name}</span>
                 </span>
@@ -51,6 +53,7 @@ export default function TokenPairSelector(props){
                   <TokenIconImg
                     size={54}
                     mr={10}
+                    token={{ address: props.selectedPair.fromAddress }}
                     imgSrc={props.selectedPair.fromTokenLogo}/>
                   <span>{props.selectedPair.name}</span>
                 </span>

@@ -66,6 +66,27 @@
   }
 }
 
+.tx-history {
+  .tx-icon {
+    flex-grow: 0 !important;
+    flex-shrink: 1 !important;
+
+    .icon {
+      font-size: 30px;
+      width: 30px;
+    }
+  }
+
+  .tx-content {
+    flex-grow: 1;
+  }
+
+  .tx-action {
+    flex-grow: 0 !important;
+    flex-shrink: 1 !important;
+  }
+}
+
 .tx-item {
   display: grid;
   gap: 10px;

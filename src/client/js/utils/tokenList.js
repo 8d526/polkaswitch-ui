@@ -68,15 +68,6 @@ window.TokenListManager = {
     });
   },
 
-  isCrossChainEnabled: function() {
-    return Storage.isCrossChainEnabled();
-  },
-
-  toggleCrossChain: function(enabled) {
-    Storage.toggleCrossChain(enabled);
-    EventManager.emitEvent('networkUpdated', 1);
-  },
-
   updateTokenList: async function() {
     var network = this.getCurrentNetworkConfig();
     var tokenList = this.getTokenListForNetwork(network);
@@ -85,7 +76,7 @@ window.TokenListManager = {
     if (network.gasApi) {
       gasStats = await(await fetch(network.gasApi)).json();
     } else {
-      const provider = new ethers.providers.JsonRpcProvider(network.nodeProvider);
+      const provider = new ethers.providers.JsonRpcProvider(network.nodeProviders[0]);
       let defaultGasPrice = Math.ceil(Utils.formatUnits((await provider.getGasPrice()), "gwei"));
 
       gasStats = { safeLow: defaultGasPrice, fast: defaultGasPrice, fastest: defaultGasPrice };
@@ -108,25 +99,8 @@ window.TokenListManager = {
     // update swap token configuration
 
     // TODO need to refactor this
-    if (this.isCrossChainEnabled()) {
-      const crossChainNetwork = _.filter(window.NETWORK_CONFIGS, (v) => {
-        return v.crossChainSupported
-      });
-
-      let toChain = crossChainNetwork.find((v) => {
-        return v.chainId !== network.chainId
-      });
-
-      const swap = {
-        from: TokenListManager.findTokenById(network.supportedCrossChainTokens[0]),
-        to: TokenListManager.findTokenById(
-            toChain.supportedCrossChainTokens[0],
-            toChain
-        ),
-        fromChain: network.name,
-        toChain: toChain.name
-      }
-      this.updateSwapConfig(swap);
+    if (false) { // TODO this.isCrossChainEnabled()) {
+      // TODO crossChain not supported in TradingView
     } else {
       const swap = {
         from: this.findTokenById(network.defaultPair.from),

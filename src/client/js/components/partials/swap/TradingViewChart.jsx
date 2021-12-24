@@ -8,9 +8,11 @@ import ChartRangeSelector from "./ChartRangeSelector";
 import EventManager from "../../../utils/events";
 import BN from 'bignumber.js';
 import TokenListManager from "../../../utils/tokenList";
+import CoingeckoManager from "../../../utils/coingecko";
 import moment from "moment";
 
 export default function TradingViewChart(){
+  const DECIMAL_PLACES = 4;
   const timeRangeList = {
     candlestick: [
       {name: "1D", value: 1, from: 'Past 1 day'},
@@ -35,28 +37,22 @@ export default function TradingViewChart(){
   const viewModes = ["candlestick", "line"];
   const candleChartContainerRef = useRef();
   const chart = useRef();
-  const getLogoURL = (network, address) => {
-    if (network === 'Polygon') {
-      network = 'smartchain'
-    }
-    const chainPart = network.toLowerCase().replace(/\s+/g, '');
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${chainPart}/assets/${address}/logo.png`
-  }
   const createTokenPairList = () => {
     const swapConfig = TokenListManager.getSwapConfig();
     const network = TokenListManager.getCurrentNetworkConfig();
     const list = []
-    if (TokenListManager.isCrossChainEnabled() && !network.crossChainSupported) {
+    if (!network.crossChainSupported) {
+      // TODO not supported at the moment
       return list;
     } else {
       const fromSymbol = swapConfig.from.symbol;
       const fromAddress = swapConfig.from.address;
       const fromChain = swapConfig.fromChain;
-      const fromTokenLogo = swapConfig.from.logoURI || getLogoURL(fromChain, fromAddress);
+      const fromTokenLogo = swapConfig.from.logoURI
       const toSymbol = swapConfig.to.symbol;
       const toAddress = swapConfig.to.address;
       const toChain = swapConfig.toChain;
-      const toTokenLogo = swapConfig.to.logoURI || getLogoURL(toChain, toAddress);
+      const toTokenLogo = swapConfig.to.logoURI
 
       list.push({
         name: fromSymbol + '/' + toSymbol,
@@ -223,7 +219,8 @@ export default function TradingViewChart(){
     let tokenPrices;
 
     setIsLoading(true);
-    if (TokenListManager.isCrossChainEnabled() && !network.crossChainSupported) {
+    if (!network.crossChainSupported) {
+      // TODO not supported at the moment
       tokenPrices = [];
     } else {
       const fromChain = TokenListManager.getNetworkByName(selectedPair.fromChain);
@@ -231,35 +228,30 @@ export default function TradingViewChart(){
 
       if (viewMode === 'line') {
         const {fromTimestamp, toTimestamp} = getTimestamps(timeRange);
-        const urlFromChain = fromChain.tradeView.lineUrl;
-        const platformFromChain = fromChain.tradeView.platform;
+        const platformOfFromChain = fromChain.coingecko.platform;
 
         if (selectedPair.fromSymbol && selectedPair.toSymbol) {
-          const urlToChain = toChain.tradeView.lineUrl;
-          const platformToChain = toChain.tradeView.platform;
-          const fromAddress = getContractAddress(selectedPair.fromAddress, selectedPair.fromSymbol, platformFromChain);
-          const toAddress = getContractAddress(selectedPair.toAddress, selectedPair.toSymbol, platformToChain);
+          const platformOfToChain = toChain.coingecko.platform;
+          const fromAddress = getContractAddress(selectedPair.fromAddress, selectedPair.fromSymbol, platformOfFromChain);
+          const toAddress = getContractAddress(selectedPair.toAddress, selectedPair.toSymbol, platformOfToChain);
 
-          fromTokenPrices = await fetchLinePrices(urlFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
-          toTokenPrices = await fetchLinePrices(urlToChain, toAddress, 'usd', fromTimestamp, toTimestamp) || [];
+          fromTokenPrices = await fetchLinePrices(platformOfFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
+          toTokenPrices = await fetchLinePrices(platformOfToChain, toAddress, 'usd', fromTimestamp, toTimestamp) || [];
           tokenPrices = mergeLinePrices(fromTokenPrices, toTokenPrices);
         } else {
-          const fromAddress = getContractAddress(selectedPair.fromAddress, selectedPair.fromSymbol, platformFromChain);
+          const fromAddress = getContractAddress(selectedPair.fromAddress, selectedPair.fromSymbol, platformOfFromChain);
 
-          fromTokenPrices = await fetchLinePrices(urlFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
+          fromTokenPrices = await fetchLinePrices(platformOfFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
           tokenPrices = mergeLinePrices(fromTokenPrices, null);
         }
       } else {
-        const urlFromChain = fromChain.tradeView.candleStickUrl;
-
         if (selectedPair.fromSymbol && selectedPair.toSymbol) {
-          const urlToChain = toChain.tradeView.candleStickUrl;
           const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.fromSymbol.toLowerCase());
           const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.toSymbol.toLowerCase());
 
           if (fromCoin && toCoin) {
-            fromTokenPrices = await fetchCandleStickPrices(urlFromChain, fromCoin.id, 'usd', timeRange.value) || [];
-            toTokenPrices = await fetchCandleStickPrices(urlToChain, toCoin.id, 'usd', timeRange.value) || [];
+            fromTokenPrices = await fetchCandleStickPrices(fromCoin.id, 'usd', timeRange.value) || [];
+            toTokenPrices = await fetchCandleStickPrices(toCoin.id, 'usd', timeRange.value) || [];
           }
 
           tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
@@ -267,7 +259,7 @@ export default function TradingViewChart(){
           const coinId = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.fromSymbol.toLowerCase());
 
           if (coinId) {
-            fromTokenPrices = await fetchCandleStickPrices(urlFromChain, coinId.id, 'usd', timeRange.value);
+            fromTokenPrices = await fetchCandleStickPrices(coinId.id, 'usd', timeRange.value);
           }
           tokenPrices = mergeCandleStickPrices(fromTokenPrices, null);
         }
@@ -316,7 +308,7 @@ export default function TradingViewChart(){
     }
   }
 
-  const fetchLinePrices = async(baseUrl, contract, currency, fromTimestamp, toTimestamp, attempt) => {
+  const fetchLinePrices = async(platform, contract, currency, fromTimestamp, toTimestamp, attempt) => {
     let result = [];
     if (!attempt) {
       attempt = 0;
@@ -324,22 +316,17 @@ export default function TradingViewChart(){
       return result;
     }
     try {
-      const response = await fetch(`${baseUrl}/contract/${contract.toLowerCase()}/market_chart/range?vs_currency=${currency}&from=${fromTimestamp}&to=${toTimestamp}`)
-      if (!response.ok) {
-        throw new Error();
-      }
-      const data = await response.json();
-      if (data) {
-        result = data.prices;
-      }
+      const url = `${platform}/contract/${contract.toLowerCase()}/market_chart/range?vs_currency=${currency}&from=${fromTimestamp}&to=${toTimestamp}`
+      result = await CoingeckoManager.fetchLinePrices(url)
       return result;
+
     } catch (err) {
       console.error("Failed to fetch price data", err);
-      await fetchLinePrices(baseUrl, contract, currency, fromTimestamp, toTimestamp, attempt + 1);
+      await fetchLinePrices(platform, contract, currency, fromTimestamp, toTimestamp, attempt + 1);
     }
   }
 
-  const fetchCandleStickPrices = async(baseUrl, coinId, currency, days, attempt) => {
+  const fetchCandleStickPrices = async(coinId, currency, days, attempt) => {
     let result = [];
     if (!attempt) {
       attempt = 0;
@@ -347,19 +334,12 @@ export default function TradingViewChart(){
       return result;
     }
     try {
-      const response = await fetch(`${baseUrl}/${coinId}/ohlc?vs_currency=${currency}&days=${days}`);
-      if (!response.ok) {
-        throw new Error();
-      }
-      const data = await response.json();
-      if (data) {
-        result = data;
-      }
-
+      const url = `${coinId}/ohlc?vs_currency=${currency}&days=${days}`
+      result = await CoingeckoManager.fetchCandleStickPrices(url)
       return result;
     } catch (err) {
       console.error("Failed to fetch price data", err);
-      await fetchCandleStickPrices(baseUrl, coinId, currency, days, attempt + 1);
+      await fetchCandleStickPrices(coinId, currency, days, attempt + 1);
     }
   }
 
@@ -370,7 +350,7 @@ export default function TradingViewChart(){
         for (let i = 0; i < fromTokenPrices.length; i++) {
           prices.push({
             time: getFilteredTimestamp(fromTokenPrices[i][0]),
-            value: BN(fromTokenPrices[i][1]).div(toTokenPrices[i][1]).toNumber()
+            value: BN(fromTokenPrices[i][1]).div(toTokenPrices[i][1]).toFixed(DECIMAL_PLACES)
           })
         }
       } else {
@@ -385,7 +365,7 @@ export default function TradingViewChart(){
             const fromTokenItem = tempObj[timeStampOfTotoken];
             tempObj[timeStampOfTotoken] = {
               time: timeStampOfTotoken,
-              value: BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toNumber()
+              value: BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toFixed(DECIMAL_PLACES)
             }
           }
         }
@@ -398,7 +378,7 @@ export default function TradingViewChart(){
       }
     } else if ((fromTokenPrices && fromTokenPrices.length > 0) && (toTokenPrices === null)) {
       for (let i = 0; i < fromTokenPrices.length; i++) {
-        prices.push({time: getFilteredTimestamp(fromTokenPrices[i][0]), value: BN(fromTokenPrices[i][1]).toNumber()})
+        prices.push({time: getFilteredTimestamp(fromTokenPrices[i][0]), value: BN(fromTokenPrices[i][1]).toFixed(DECIMAL_PLACES)})
       }
     }
     return prices;
@@ -418,10 +398,10 @@ export default function TradingViewChart(){
           const fromTokenItem = tempObj[timeStampOfTotoken];
           tempObj[timeStampOfTotoken] = {
             time: timeStampOfTotoken,
-            open: BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toNumber(),
-            high: BN(fromTokenItem[2]).div(toTokenPrices[j][2]).toNumber(),
-            low: BN(fromTokenItem[3]).div(toTokenPrices[j][3]).toNumber(),
-            close: BN(fromTokenItem[4]).div(toTokenPrices[j][4]).toNumber(),
+            open: BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toFixed(DECIMAL_PLACES),
+            high: BN(fromTokenItem[2]).div(toTokenPrices[j][2]).toFixed(DECIMAL_PLACES),
+            low: BN(fromTokenItem[3]).div(toTokenPrices[j][3]).toFixed(DECIMAL_PLACES),
+            close: BN(fromTokenItem[4]).div(toTokenPrices[j][4]).toFixed(DECIMAL_PLACES),
           }
         }
       }
@@ -436,10 +416,10 @@ export default function TradingViewChart(){
       for (let i = 0; i < fromTokenPrices.length; i++) {
         prices.push({
           time: getFilteredTimestamp(fromTokenPrices[i][0]),
-          open: BN(fromTokenPrices[i][1]).toNumber(),
-          high: BN(fromTokenPrices[i][2]).toNumber(),
-          low: BN(fromTokenPrices[i][3]).toNumber(),
-          close: BN(fromTokenPrices[i][4]).toNumber(),
+          open: BN(fromTokenPrices[i][1]).toFixed(DECIMAL_PLACES),
+          high: BN(fromTokenPrices[i][2]).toFixed(DECIMAL_PLACES),
+          low: BN(fromTokenPrices[i][3]).toFixed(DECIMAL_PLACES),
+          close: BN(fromTokenPrices[i][4]).toFixed(DECIMAL_PLACES),
         })
       }
     }
@@ -477,7 +457,7 @@ export default function TradingViewChart(){
     return {fromTimestamp, toTimestamp}
   }
 
-  const dateFormatter = (item) => moment(item).format("h:mm A MMM. Do z");
+  const dateFormatter = (item) => moment(item * 1000).format("h:mm A MMM. Do z");
 
   const handleSwapConfigChange = () => {
     const updatedTokenPairList = createTokenPairList();

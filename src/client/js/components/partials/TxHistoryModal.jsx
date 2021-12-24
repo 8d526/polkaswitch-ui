@@ -22,7 +22,7 @@ export default class TxHistoryModal extends Component {
       refresh: Date.now(),
       open: false,
       loading: false,
-      showSingleChain: !TokenListManager.isCrossChainEnabled()
+      showSingleChain: false
     };
 
     this.fetchCrossChainHistory = this.fetchCrossChainHistory.bind(this);

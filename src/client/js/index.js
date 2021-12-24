@@ -1,13 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
-import Wallet from './utils/wallet';
-import TokenListManager from './utils/tokenList';
-import SwapFn from './utils/swapFn';
-import Nxtp from './utils/nxtp';
-import HopUtils from './utils/hop';
-import TxQueue from './utils/txQueue';
-import Storage from './utils/storage';
 import _ from 'underscore';
 import { ethers } from 'ethers';
 import BN from 'bignumber.js';
@@ -51,6 +44,15 @@ window.NETWORK_CONFIGS = await config.json();
 // initialize TokenList
 window.COINGECKO_TOKEN_LIST = await(await fetch('/tokens/coingecko.list.json')).json();
 window.MAX_RETRIES = process.env.IS_PRODUCTION ? 3 : 1;
+
+// import after NETWORK_CONFIGs is initialized
+import Wallet from './utils/wallet';
+import TokenListManager from './utils/tokenList';
+import SwapFn from './utils/swapFn';
+import Nxtp from './utils/nxtp';
+import HopUtils from './utils/hop';
+import TxQueue from './utils/txQueue';
+import Storage from './utils/storage';
 
 await Storage.initialize();
 await TokenListManager.initialize();

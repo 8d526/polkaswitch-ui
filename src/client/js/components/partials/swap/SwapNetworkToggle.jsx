@@ -5,7 +5,6 @@ import * as Sentry from "@sentry/react";
 import Wallet from '../../../utils/wallet';
 import EventManager from '../../../utils/events';
 import TokenListManager from '../../../utils/tokenList';
-import CrossChainToggle from './CrossChainToggle';
 import NetworkDropdown from '../NetworkDropdown';
 
 export default class SwapNetworkToggle extends Component {
@@ -17,7 +16,6 @@ export default class SwapNetworkToggle extends Component {
     this.state = {
       selected: TokenListManager.getCurrentNetworkConfig(),
       active: false,
-      singleChain: !TokenListManager.isCrossChainEnabled(),
       hoverable: true,
     };
 
@@ -65,8 +63,7 @@ export default class SwapNetworkToggle extends Component {
             <div className="level-item">
               <NetworkDropdown
                 className={classnames("is-right", {
-                "is-hoverable": this.state.hoverable,
-                "is-hidden": !this.state.singleChain
+                "is-hoverable": this.state.hoverable
                 })}
                 selected={this.state.selected}
                 handleDropdownClick={this.handleDropdownClick}

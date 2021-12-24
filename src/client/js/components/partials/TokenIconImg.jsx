@@ -1,67 +1,68 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import _ from "underscore";
 import classnames from 'classnames';
-import Storage from "../../utils/storage";
+import CoingeckoManager from "../../utils/coingecko";
 
-export default class TokenIconImg extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { errored: false };
-    this.onError = this.onError.bind(this);
-    this.onLoad = this.onLoad.bind(this);
-  }
+export default function TokenIconImg(props) {
+  let imgURL = props.imgSrc || (props.token && props.token.logoURI);
+  // init state
+  const [errored, setErrored] = useState(false);
+  const [imgSrc, setImgSrc] = useState('');
 
-  onError(e) {
-    this.setState({ errored: true });
-  }
-
-  onLoad(e) {
-    this.setState({ errored: false });
-  }
-
-  render() {
-    let errored = this.state.errored;
-    let imgSrc;
-
-    if (!errored) {
-      imgSrc = this.props.imgSrc || (this.props.token && this.props.token.logoURI);
-
-      if (!imgSrc) {
-        if (this.props.token) {
-          var network = this.props.network || TokenListManager.getCurrentNetworkConfig();
-          const chainPart = network.name.toLowerCase().replace(/\s+/g, '');
-          const keyPart = this.props.token.address || this.props.token.symbol;
-          imgSrc = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${chainPart}/assets/${keyPart}/logo.png`;
+  useEffect(async () => {
+    if (!imgURL) {
+      if (props.token && props.token.address) {
+        const logoURL = await getLogoURL();
+        if (logoURL) {
+          setImgSrc(logoURL);
         } else {
-          errored = true;
+          setErrored(true);
         }
+      } else {
+        setErrored(true);
       }
+    } else {
+      setImgSrc(imgURL);
     }
+  }, [imgURL, props.token?.symbol, props.token?.address]);
 
-    return (
+  const onError = (e) => {
+    setErrored(true);
+  }
+
+  const onLoad = (e) => {
+    setErrored(false);
+  }
+
+  const getLogoURL = async() => {
+    var network = props.network || TokenListManager.getCurrentNetworkConfig();
+    const assetPlatform = network.coingecko && network.coingecko.platform || '';
+    return await CoingeckoManager.getLogoURL(assetPlatform, props.token.address);
+  }
+
+  return (
       <span
-        className={classnames("token-icon-img-wrapper", { "errored": errored })}
-        style={{
-          height: `${this.props.size || 40}px`,
-          width: `${this.props.size || 40}px`,
-          marginLeft: `${this.props.ml || 0}px`,
-          marginRight: `${this.props.mr || 0}px`,
-          zIndex: `${this.props.z_index || 0}`
-        }}>
-        <img
-          { ... _.omit(this.props, 'imgSrc', 'token', 'size') }
-          onLoad={this.onLoad}
-          onError={this.onError}
+          className={classnames("token-icon-img-wrapper", { "errored": errored })}
           style={{
-            height: `${this.props.size || 40}px`,
-            width: `${this.props.size || 40}px`
+            height: `${props.size || 40}px`,
+            width: `${props.size || 40}px`,
+            marginRight: `${props.mr || 0}px`,
+            zIndex: `${props.z_index || 0}`
+          }}>
+      <img
+          { ... _.omit(props, 'imgSrc', 'token', 'size') }
+          onLoad={onLoad}
+          onError={onError}
+          style={{
+            height: `${props.size || 40}px`,
+            width: `${props.size || 40}px`
           }}
           src={imgSrc} />
-        <span className="icon">
-          <ion-icon name="cube-outline"></ion-icon>
-        </span>
+      <span className="icon">
+        <ion-icon name="cube-outline"/>
       </span>
-    );
-  }
+    </span>
+  );
 }
+
 
