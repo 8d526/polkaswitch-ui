@@ -11,7 +11,7 @@
     "build": "webpack --mode production --env production --env main",
     "ci-build": "webpack --mode production --env development",
     "watch": "webpack --watch --mode development --env development",
-    "start": "npm run server &; npm run watch",
+    "start": "npm run server ; npm run watch",
     "server": "nodemon -r dotenv/config src/server/index.js"
   },
   "author": "polkaswitch",
